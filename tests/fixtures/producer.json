@@ -1,0 +1,8 @@
+{
+    "database": "mysql",
+    "resources": {
+        "client": {
+            "name":
+        }
+    }
+}

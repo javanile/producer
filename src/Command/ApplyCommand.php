@@ -1,6 +1,6 @@
 <?php
 
-namespace Javanile\Producer\Commands;
+namespace Javanile\Producer\Command;
 
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;

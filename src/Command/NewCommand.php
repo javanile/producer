@@ -1,7 +1,10 @@
 <?php
 
-namespace Javanile\Producer\Commands;
+namespace Javanile\Producer\Command;
 
+use Composer\Factory;
+use Composer\Json\JsonFile;
+use Composer\Package\Version\VersionParser;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,6 +17,9 @@ use Symfony\Component\Process\Process;
 
 class NewCommand extends BaseCommand
 {
+    private $file;
+    private $json;
+
     /**
      * Configure the command options.
      *
@@ -43,6 +49,23 @@ class NewCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($input->getOption('file')) {
+            $this->file = $input->getOption('file');
+        } else {
+            $this->file = './producer.json';
+        }
+
+        $this->json = new JsonFile($this->file);
+        $config = $this->json->read();
+        $config['from'];
+
+        if (empty($config['from'])) {
+            throw new RuntimeException('Empty "from" attribute on template file!');
+        }
+
+        $parser = new VersionParser();
+        $from = $parser->parseNameVersionPairs(array($config['from']));
+
         /*
         if ($input->getOption('jet')) {
             $output->write(PHP_EOL."<fg=magenta>
@@ -72,7 +95,7 @@ class NewCommand extends BaseCommand
 
         $directory = $name && $name !== '.' ? getcwd().'/'.$name : '.';
 
-        $version = $this->getVersion($input);
+        //$version = $this->getVersion($input);
 
         /*
         if (! $input->getOption('force')) {
@@ -87,7 +110,7 @@ class NewCommand extends BaseCommand
         $composer = $this->findComposer();
 
         $commands = [
-            $composer." create-project laravel/laravel \"$directory\" $version --remove-vcs --prefer-dist",
+            $composer." create-project {$from[0][name]} \"$directory\" {$from[0][version]} --remove-vcs --prefer-dist",
         ];
 
         if ($directory != '.' && $input->getOption('force')) {
@@ -104,23 +127,13 @@ class NewCommand extends BaseCommand
 
         if (($process = $this->runCommands($commands, $input, $output))->isSuccessful()) {
             if ($name && $name !== '.') {
-                $this->replaceInFile(
-                    'APP_URL=http://localhost',
-                    'APP_URL=http://'.$name.'.test',
-                    $directory.'/.env'
-                );
-
-                $this->replaceInFile(
-                    'DB_DATABASE=laravel',
-                    'DB_DATABASE='.str_replace('-', '_', strtolower($name)),
-                    $directory.'/.env'
-                );
-
-                $this->replaceInFile(
-                    'DB_DATABASE=laravel',
-                    'DB_DATABASE='.str_replace('-', '_', strtolower($name)),
-                    $directory.'/.env.example'
-                );
+                if (isset($config['replace'])) {
+                    foreach ($config['replace'] as $file => $pairs) {
+                        foreach($pairs as $search => $replace) {
+                            $this->replaceInFile($search, $replace, $file);
+                        }
+                    }
+                }
             }
 
             if ($input->getOption('jet')) {
@@ -212,84 +225,5 @@ class NewCommand extends BaseCommand
         */
 
         return '';
-    }
-
-    /**
-     * Get the composer command for the environment.
-     *
-     * @return string
-     */
-    protected function findComposer()
-    {
-        $composerPath = getcwd().'/composer.phar';
-
-        if (file_exists($composerPath)) {
-            return '"'.PHP_BINARY.'" '.$composerPath;
-        }
-
-        return 'composer';
-    }
-
-    /**
-     * Run the given commands.
-     *
-     * @param  array  $commands
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return Process
-     */
-    protected function runCommands($commands, InputInterface $input, OutputInterface $output)
-    {
-        if ($input->getOption('no-ansi')) {
-            $commands = array_map(function ($value) {
-                if (substr($value, 0, 5) === 'chmod') {
-                    return $value;
-                }
-
-                return $value.' --no-ansi';
-            }, $commands);
-        }
-
-        if ($input->getOption('quiet')) {
-            $commands = array_map(function ($value) {
-                if (substr($value, 0, 5) === 'chmod') {
-                    return $value;
-                }
-
-                return $value.' --quiet';
-            }, $commands);
-        }
-
-        $process = Process::fromShellCommandline(implode(' && ', $commands), null, null, null, null);
-
-        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
-            try {
-                $process->setTty(true);
-            } catch (RuntimeException $e) {
-                $output->writeln('Warning: '.$e->getMessage());
-            }
-        }
-
-        $process->run(function ($type, $line) use ($output) {
-            $output->write('    '.$line);
-        });
-
-        return $process;
-    }
-
-    /**
-     * Replace the given string in the given file.
-     *
-     * @param  string  $search
-     * @param  string  $replace
-     * @param  string  $file
-     * @return string
-     */
-    protected function replaceInFile(string $search, string $replace, string $file)
-    {
-        file_put_contents(
-            $file,
-            str_replace($search, $replace, file_get_contents($file))
-        );
     }
 }
