@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Installer\Console\Tests;
+namespace Javanile\Producer\Tests\Commands;
 
 use Laravel\Installer\Console\NewCommand;
 use PHPUnit\Framework\TestCase;

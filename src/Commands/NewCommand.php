@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Installer\Console;
+namespace Javanile\Producer\Commands;
 
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
-class NewCommand extends Command
+class NewCommand extends BaseCommand
 {
     /**
      * Configure the command options.
@@ -23,13 +23,15 @@ class NewCommand extends Command
     {
         $this
             ->setName('new')
-            ->setDescription('Create a new Laravel application')
+            ->setDescription('Create a new PHP application')
             ->addArgument('name', InputArgument::OPTIONAL)
-            ->addOption('dev', null, InputOption::VALUE_NONE, 'Installs the latest "development" release')
-            ->addOption('jet', null, InputOption::VALUE_NONE, 'Installs the Laravel Jetstream scaffolding')
-            ->addOption('stack', null, InputOption::VALUE_OPTIONAL, 'The Jetstream stack that should be installed')
-            ->addOption('teams', null, InputOption::VALUE_NONE, 'Indicates whether Jetstream should be scaffolded with team support')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
+            ->addOption('file', null, InputOption::VALUE_REQUIRED, 'Use local file as application template')
+            //->addOption('dev', null, InputOption::VALUE_NONE, 'Installs the latest "development" release')
+            //->addOption('jet', null, InputOption::VALUE_NONE, 'Installs the Laravel Jetstream scaffolding')
+            //->addOption('stack', null, InputOption::VALUE_OPTIONAL, 'The Jetstream stack that should be installed')
+            //->addOption('teams', null, InputOption::VALUE_NONE, 'Indicates whether Jetstream should be scaffolded with team support')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists')
+            ;
     }
 
     /**
@@ -41,6 +43,7 @@ class NewCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /*
         if ($input->getOption('jet')) {
             $output->write(PHP_EOL."<fg=magenta>
     |     |         |
@@ -63,6 +66,7 @@ class NewCommand extends Command
         }
 
         sleep(1);
+        */
 
         $name = $input->getArgument('name');
 
@@ -70,6 +74,7 @@ class NewCommand extends Command
 
         $version = $this->getVersion($input);
 
+        /*
         if (! $input->getOption('force')) {
             $this->verifyApplicationDoesntExist($directory);
         }
@@ -77,6 +82,7 @@ class NewCommand extends Command
         if ($input->getOption('force') && $directory === '.') {
             throw new RuntimeException('Cannot use --force option when using current directory for installation!');
         }
+        */
 
         $composer = $this->findComposer();
 
@@ -199,9 +205,11 @@ class NewCommand extends Command
      */
     protected function getVersion(InputInterface $input)
     {
+        /*
         if ($input->getOption('dev')) {
             return 'dev-develop';
         }
+        */
 
         return '';
     }

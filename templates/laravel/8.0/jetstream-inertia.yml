@@ -1,0 +1,9 @@
+version: '1.0'
+
+name: jeststream-inertia
+
+database: mysql
+
+stack:
+  - jetstream
+  - inertia
