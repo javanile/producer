@@ -1,5 +1,4 @@
 {
-    "name": "jetstream-inertia",
     "from": "laravel/laravel:8.0",
 
     "database": "mysql",

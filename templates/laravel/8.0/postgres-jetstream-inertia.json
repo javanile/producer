@@ -1,7 +1,8 @@
 {
-    "name": "jetstream-inertia",
-    "version": "1.0'",
-    "database": "mysql",
+    "from": "laravel",
+
+    "database": "postgres-jetstream-inertia",
+
     "stack": {
         "jetstream": "",
         "inertia": ""
