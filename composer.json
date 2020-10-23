@@ -1,12 +1,12 @@
 {
-    "name": "laravel/installer",
-    "description": "Laravel application installer.",
+    "name": "javanile/producer",
+    "description": "Laravel prototyping tool.",
     "keywords": ["laravel"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Taylor Otwell",
-            "email": "taylor@laravel.com"
+            "name": "Francesco Bianco",
+            "email": "bianco@javanile.org"
         }
     ],
     "require": {
@@ -18,21 +18,21 @@
         "phpunit/phpunit": "^8.0"
     },
     "bin": [
-        "bin/laravel"
+        "bin/producer"
     ],
     "autoload": {
         "psr-4": {
-            "Laravel\\Installer\\Console\\": "src/"
+            "Javanile\\Producer\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Laravel\\Installer\\Console\\Tests\\": "tests/"
+            "Laravel\\Installer\\Tests\\": "tests/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.x-dev"
+            "dev-master": "1.x-dev"
         }
     },
     "config": {
