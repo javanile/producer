@@ -5,6 +5,7 @@ namespace Javanile\Producer\Command;
 use Composer\Factory;
 use Composer\Json\JsonFile;
 use Composer\Package\Version\VersionParser;
+use Javanile\Producer\Manipulator\BaseManipulator;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -65,7 +66,10 @@ class NewCommand extends BaseCommand
 
         $parser = new VersionParser();
         $from = $parser->parseNameVersionPairs(array($config['from']));
+        $fromPackage = $from[0]['name'];
+        $fromVersion = $from[0]['version'];
 
+        $manipulator = BaseManipulator::createManipulator($fromPackage, $fromVersion, $config);
         /*
         if ($input->getOption('jet')) {
             $output->write(PHP_EOL."<fg=magenta>
@@ -110,7 +114,7 @@ class NewCommand extends BaseCommand
         $composer = $this->findComposer();
 
         $commands = [
-            $composer." create-project {$from[0][name]} \"$directory\" {$from[0][version]} --remove-vcs --prefer-dist",
+            $composer." create-project {$fromPackage} \"$directory\" {$fromVersion} --remove-vcs --prefer-dist",
         ];
 
         if ($directory != '.' && $input->getOption('force')) {
@@ -126,75 +130,11 @@ class NewCommand extends BaseCommand
         }
 
         if (($process = $this->runCommands($commands, $input, $output))->isSuccessful()) {
-            if ($name && $name !== '.') {
-                if (isset($config['replace'])) {
-                    foreach ($config['replace'] as $file => $pairs) {
-                        foreach($pairs as $search => $replace) {
-                            $this->replaceInFile($search, $replace, $file);
-                        }
-                    }
-                }
-            }
-
-            if ($input->getOption('jet')) {
-                $this->installJetstream($directory, $stack, $teams, $input, $output);
-            }
-
+            $manipulator->postCreateProject();
             $output->writeln(PHP_EOL.'<comment>Application ready! Build something amazing.</comment>');
         }
 
         return $process->getExitCode();
-    }
-
-    /**
-     * Install Laravel Jetstream into the application.
-     *
-     * @param  string  $directory
-     * @param  string  $stack
-     * @param  bool  $teams
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return void
-     */
-    protected function installJetstream(string $directory, string $stack, bool $teams, InputInterface $input, OutputInterface $output)
-    {
-        chdir($directory);
-
-        $commands = array_filter([
-            $this->findComposer().' require laravel/jetstream',
-            trim(sprintf(PHP_BINARY.' artisan jetstream:install %s %s', $stack, $teams ? '--teams' : '')),
-            $stack === 'inertia' ? 'npm install && npm run dev' : null,
-            PHP_BINARY.' artisan storage:link',
-        ]);
-
-        $this->runCommands($commands, $input, $output);
-    }
-
-    /**
-     * Determine the stack for Jetstream.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return string
-     */
-    protected function jetstreamStack(InputInterface $input, OutputInterface $output)
-    {
-        $stacks = [
-            'livewire',
-            'inertia',
-        ];
-
-        if ($input->getOption('stack') && in_array($input->getOption('stack'), $stacks)) {
-            return $input->getOption('stack');
-        }
-
-        $helper = $this->getHelper('question');
-
-        $question = new ChoiceQuestion('Which Jetstream stack do you prefer?', $stacks);
-
-        $output->write(PHP_EOL);
-
-        return $helper->ask($input, new SymfonyStyle($input, $output), $question);
     }
 
     /**
