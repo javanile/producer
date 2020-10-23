@@ -21,6 +21,10 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 Please review [our security policy](https://github.com/laravel/installer/security/policy) on how to report security vulnerabilities.
 
+## Credits
+
+> TBC
+
 ## License
 
 Laravel Installer is open-sourced software licensed under the [MIT license](LICENSE.md).
