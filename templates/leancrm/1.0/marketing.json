@@ -1,0 +1,10 @@
+{
+    "from": "laravel/laravel:8",
+
+    "database": "postgres",
+
+    "stack": [
+        "jetstream",
+        "inertia"
+    ]
+}
