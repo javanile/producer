@@ -9,7 +9,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class NewCommandTest extends TestCase
 {
-    public function test_it_can_scaffold_a_new_laravel_app()
+    public function test_it_can_scaffold_a_new_app()
     {
         $scaffoldDirectoryName = 'tests-output/my-app';
         $scaffoldDirectory = __DIR__.'/../'.$scaffoldDirectoryName;
@@ -22,7 +22,7 @@ class NewCommandTest extends TestCase
             }
         }
 
-        $app = new Application('Laravel Installer');
+        $app = new Application('Producer');
         $app->add(new NewCommand);
 
         $tester = new CommandTester($app->find('new'));
