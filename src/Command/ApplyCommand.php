@@ -12,7 +12,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
-class NewCommand extends BaseCommand
+class ApplyCommand extends BaseCommand
 {
     /**
      * Configure the command options.
@@ -37,40 +37,15 @@ class NewCommand extends BaseCommand
     /**
      * Execute the command.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  InputInterface  $input
+     * @param  OutputInterface  $output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /*
-        if ($input->getOption('jet')) {
-            $output->write(PHP_EOL."<fg=magenta>
-    |     |         |
-    |,---.|--- ,---.|--- ,---.,---.,---.,-.-.
-    ||---'|    `---.|    |    |---',---|| | |
-`---'`---'`---'`---'`---'`    `---'`---^` ' '</>".PHP_EOL.PHP_EOL);
-
-            $stack = $this->jetstreamStack($input, $output);
-
-            $teams = $input->getOption('teams') === true
-                    ? (bool) $input->getOption('teams')
-                    : (new SymfonyStyle($input, $output))->confirm('Will your application use teams?', false);
-        } else {
-            $output->write(PHP_EOL.'<fg=red> _                               _
-| |                             | |
-| |     __ _ _ __ __ ___   _____| |
-| |    / _` | \'__/ _` \ \ / / _ \ |
-| |___| (_| | | | (_| |\ V /  __/ |
-|______\__,_|_|  \__,_| \_/ \___|_|</>'.PHP_EOL.PHP_EOL);
-        }
-
-        sleep(1);
-        */
-
         $name = $input->getArgument('name');
 
-        $directory = $name && $name !== '.' ? getcwd().'/'.$name : '.';
+        $directory = getcwd();
 
         $version = $this->getVersion($input);
 
